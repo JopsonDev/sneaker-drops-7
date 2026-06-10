@@ -6,6 +6,7 @@ import com.pluralsight.sneakerdrop.sneakerdrops.models.Brand;
 import com.pluralsight.sneakerdrop.sneakerdrops.models.Sneaker;
 import com.pluralsight.sneakerdrop.sneakerdrops.service.DropService;
 import com.pluralsight.sneakerdrop.sneakerdrops.service.InventoryService;
+import org.hibernate.type.format.JsonDocumentItemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,9 @@ public class StartupRunner implements CommandLineRunner {
             System.out.println("4). Find by release year");
             System.out.println("5). Find by ID");
             System.out.println("6). Advance Search");
+            System.out.println("7). Add shoe");
+            System.out.println("8). Update Price");
+            System.out.println("9). Delete shoe");
             System.out.println("0). Quit");
             System.out.print("Input: ");
             int input = scanner.nextInt();
@@ -52,6 +56,9 @@ public class StartupRunner implements CommandLineRunner {
                 case 4 -> listSneakerByYear(scanner);
                 case 5 -> viewByID(scanner);
                 case 6 -> advanceSearch(scanner);
+                case 7 -> addShoe(scanner);
+                case 8 -> updatePrice(scanner);
+                case 9 -> deleteShoe(scanner);
                 case 0 -> {
                     return;
                 }
@@ -117,6 +124,38 @@ public class StartupRunner implements CommandLineRunner {
         for(Sneaker s : sneakerRepository.search(price, year)){
             System.out.println(s.getId() + " - " + s.getModel());
         }
+    }
+
+    private void addShoe(Scanner scanner){
+        System.out.print("Model: ");
+        String model = scanner.nextLine();
+        System.out.print("New Price: ");
+        double price = scanner.nextDouble();
+        System.out.print("Release year: ");
+        int year = scanner.nextInt();
+        scanner.nextLine();
+        sneakerRepository.save(new Sneaker(model, price, year));
+        System.out.println("Updated!");
+    }
+
+    private void updatePrice(Scanner scanner){
+        System.out.print("Snaker ID: ");
+        long id = scanner.nextLong();
+        Sneaker sneaker = sneakerRepository.findById(id).orElseThrow(() -> new RuntimeException("No Sneakers with id" + id));
+        System.out.print("New Price: ");
+        sneaker.setPrice(scanner.nextDouble());
+        scanner.nextLine();
+        sneakerRepository.save(sneaker);
+        System.out.println("Updated!");
+    }
+
+    private void deleteShoe(Scanner scanner){
+        System.out.print("Snaker ID: ");
+        long id = scanner.nextLong();
+        Sneaker sneaker = sneakerRepository.findById(id).orElseThrow(() -> new RuntimeException("No Sneakers with id" + id));
+        scanner.nextLine();
+        sneakerRepository.delete(sneaker);
+        System.out.println("Updated!");
     }
 
     private void seedData() {
